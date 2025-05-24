@@ -3,7 +3,7 @@
 # @Author  : Zhanglin
 # @Project    : SucArena
 # @File    : vote_for_winner_except_self.txt
-# @Description: 所有角色对所有其他主要角色进行投票【不能投自己】
+# @Description: All characters vote for all other main characters (voting for oneself is not allowed).
 
 <commentblockmarker>###</commentblockmarker>
 

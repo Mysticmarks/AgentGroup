@@ -3,7 +3,7 @@
 # @Author  : Zhouhong Gu
 # @Project    : SucArena
 # @File    : prompt_4_update.txt
-# @Description: 让self agent根据所有的Environment Description和Candidates List来更新relationship和judgement
+# @Description: This prompt requires the self agent to update relationships and judgments based on all Environment Descriptions and Candidate Lists.
 
 Variables:
 !<INPUT 0>! -- Self Agent ID Number

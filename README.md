@@ -5,14 +5,14 @@
 
 <p align="center">
   <a href="https://arxiv.org/abs/2403.13433">[Paper Link]</a>
-  <a>[Website (Comming Soon)]</a>
-  <a>[PlayGround (Comming Soon)]</a>
+  <a>[Website (Coming Soon)]</a>
+  <a>[PlayGround (Coming Soon)]</a>
 </p>
 
 
 <h1 align="left">🔆 Introduction</h1>
 
-To investigate the role of language in human collective behaviors, we developed the Agent Group Chat simulation to simulate linguistic interactions among multi-agent in different settings. Agents are asked to free chat in this simulation for their own purposes based on their character setting, aiming to see agents exhibit emergent behaviours that are both unforeseen and significant. Four narrative scenarios, Inheritance Disputes, Law Court Debates, Philosophical Discourses, Movie Casting Contention, are integrated into Agent Group Chat to evaluate its support for diverse storylines. By configuring specific environmental settings within Agent Group Chat, we are able to assess whether agents exhibit behaviors that align with human expectations. We evaluate the disorder within the environment by computing the n-gram Shannon entropy of all the content speak by characters. Our findings reveal that under the premise of agents possessing substantial alignment with human expectations, facilitating more extensive information exchange within the simulation ensures greater orderliness amidst diversity, which leads to the emergence of more unexpected and meaningful emergent behaviors. The code is open source in this https URL, and online platform will be open soon.
+To investigate the role of language in human collective behaviors, we developed the Agent Group Chat simulation to simulate linguistic interactions among multi-agent in different settings. Agents are asked to free chat in this simulation for their own purposes based on their character setting, aiming to see agents exhibit emergent behaviours that are both unforeseen and significant. Four narrative scenarios, Inheritance Disputes, Law Court Debates, Philosophical Discourses, Movie Casting Contention, are integrated into Agent Group Chat to evaluate its support for diverse storylines. By configuring specific environmental settings within Agent Group Chat, we are able to assess whether agents exhibit behaviors that align with human expectations. We evaluate the disorder within the environment by computing the n-gram Shannon entropy of all the content speak by characters. Our findings reveal that when agents are well-aligned with human expectations, facilitating more extensive information exchange within the simulation promotes greater orderliness amidst diversity. This, in turn, leads to the emergence of more unexpected and significant emergent behaviors. The code is open source in this https URL, and an online platform will be available soon.
 
 <h1 align="left">📝 Change Log</h1>
 
@@ -69,8 +69,8 @@ Our code does not contain Front-end for now, we will upload Front-end code soon.
 "main_character": Whether it is a main character,
 "support_character": Which character it supports [temporarily set so that main characters do not support others],
 "objective": The character's objective,
-"scratch": The character's script [visible to themselves only],
-"background": The character's background [visible to everyone],
+"scratch": The character's script [Visible only to the character],
+"background": The character's background [Visible to all characters],
 "engine": The model driving the character [options include 'gpt3.5', 'gpt4', 'human', 'glm-3-turbo', 'glm-4', 'hunyuan-chatpro', 'hunyuan-chatstd', or model parameters from huggingface (like 'THUDM/chatglm3-6b-32k')],
 "belief": The character's belief [might switch between different beliefs],
 "judgement": The character's judgement of relationships between other characters [not implemented yet],
@@ -83,7 +83,7 @@ Our code does not contain Front-end for now, we will upload Front-end code soon.
 ### Resource
 ```markdown
 "name": The name of the resource,
-"id_number": R + the resource's ID Number,
+"id_number": A unique identifier for the resource, typically prefixed with 'R'.,
 "description": Introduction to the resource,
 "influence": The numerical influence value of the resource,
 "owner": The owner of the resource,
@@ -123,7 +123,7 @@ Our code does not contain Front-end for now, we will upload Front-end code soon.
 
 ## 📱 Contact:
 
-If you have any problems, please contact <a src="zhgu22@m.fudan.edu.cn">Zhouhong Gu</a>.
+If you have any problems, please contact <a href="mailto:zhgu22@m.fudan.edu.cn">Zhouhong Gu</a>.
 
 ## 📖 TODO List:
 

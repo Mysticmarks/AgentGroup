@@ -3,7 +3,7 @@
 # @Author  : Zhouhong Gu
 # @Project    : SucArena
 # @File    : prompt_4_act.txt
-# @Description: 要求Self Agent根据自己的描述，环境描述，行动历史，从候选人列表中选择适合的对话对象
+# @Description: This prompt requires the Self Agent to select a suitable dialogue partner from a candidate list based on its own description, the environment description, and its action history.
 
 Variables:
 !<INPUT 0>! -- Self Agent ID Number
@@ -29,7 +29,7 @@ Now, please choose one role which you want talk to from the following candidate 
 !<INPUT 5>!
 
 Then you need to have a total of !<INPUT 6>! turns of dialogue with your chosen character. Please think about your dialogue strategy and output the topic of each turn of dialogue after "### Plan:".
-请你在"### Action Space:"后面输出你所有可以选择的角色，并用英文逗号","进行分隔。
+Please output all the roles you can choose after "### Action Space:", separated by English commas ",".
 Finally, please choose the name of the role you want to talk to, please output the name directly after "### Choose:", such as C0001, do not reply any additional content.
 Reminder: Your output must be in English.
 Here is an example of your response:

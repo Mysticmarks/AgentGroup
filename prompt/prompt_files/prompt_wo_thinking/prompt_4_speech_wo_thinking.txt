@@ -3,7 +3,7 @@
 # @Author  : Zhouhong Gu
 # @Project    : SucArena
 # @File    : prompt_4_speech.txt
-# @Description: 让self agent根据环境的描述，来做最终宣言
+# @Description: This prompt requires the self agent to make a final declaration based on the environment's description.
 
 Variables:
 !<INPUT 0>! -- Self Agent ID Number
@@ -31,7 +31,7 @@ Here are all the events you've heard about so far (more recent events are listed
 Here are all the social resources you have access to and the description of these social resources in this game (the higher the social influence, the more power the organization owner has):
 !<INPUT 4>!
 
-目前所有角色的介绍如下：
+The descriptions of all current roles are as follows:
 !<INPUT 3>!
 
 The character you support so far is：
@@ -41,7 +41,7 @@ Reminder:
 1. You should output your speech after '### Speech:'.
 2. Your output must be in English.
 3. Please Don't generate "\n" after ### Speech.
-4. 你正在跟所有角色对话，请注意你的措辞，你可以在对话中提及某个角色，但不要一直对某个角色讲话。
+4. You are speaking to all characters, so please be mindful of your wording. You can mention a specific character in the dialogue, but avoid addressing only one character continuously.
 
 Here is an example of your response:
 ### Speech: xxxxx

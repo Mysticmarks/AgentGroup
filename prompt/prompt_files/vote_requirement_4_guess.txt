@@ -3,7 +3,7 @@
 # @Author  : Zhanglin
 # @Project    : SucArena
 # @File    : vote_requirement_4_guess.txt
-# @Description: 所有角色会根据已知信息猜测哪个主要角色会赢得游戏
+# @Description: All characters will guess which main character will win the game based on known information.
 
 <commentblockmarker>###</commentblockmarker>
 
