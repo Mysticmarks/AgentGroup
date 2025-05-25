@@ -27,7 +27,7 @@ with open(log_file, 'r', encoding='utf-8') as f:
             print('### Thought\n')
             print(kwargs['prompt'])
             print()
-            print('长度:',len(kwargs['prompt']))
+            print('Length:',len(kwargs['prompt']))
             print('==='*20)
         
         # log = eval(log)

@@ -3,7 +3,7 @@ import re
 
 def copy_dir(src_path, target_path):
 	"""
-	将某文件夹整体复制进指定文件夹，两个路径均需已存在
+	Copies an entire folder into a specified folder; both paths must already exist.
 	"""
 	if os.path.isdir(src_path) and os.path.isdir(target_path):
 		filelist_src = os.listdir(src_path)

@@ -3,7 +3,7 @@
 # @Author  : Zhouhong Gu
 # @Project    : SucArena
 # @File    : prompt_4_perceive.txt
-# @Description: 让self agent根据环境的描述，来生成对环境的总结
+# @Description: This prompt requires the self agent to generate a summary of the environment based on the environment's description.
 
 Variables:
 !<INPUT 0>! -- Self Agent ID Number

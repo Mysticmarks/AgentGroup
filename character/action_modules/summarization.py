@@ -8,7 +8,7 @@ def run_summarization(self_agent_id_number: str,
                       engine='gpt4',
                       logger=None):
     '''
-    让source_character根据environment_description和target_character_list来选择target_character
+    Allows the source_character to summarize chat history based on environment_description.
 
     Input:
         self_agent_id_number: str,
@@ -16,13 +16,13 @@ def run_summarization(self_agent_id_number: str,
         self_agent_description: str,
         target_agent_description: str,
         environment_summary: str,
-        chat_history: str, 描述当前轮数
+        chat_history: str, the conversation history to be summarized.
         planning: str,
         engine: str,
-        logger: Logger, 已有的logger类
+        logger: Logger, existing logger class.
 
     Output:
-        target_character_id_number: str, 被选中角色的ID Number
+        thought: str, chat_round: str, action_event: list containing the summarization.
     '''
 
     gpt_param = {"max_tokens": 500,
@@ -45,8 +45,8 @@ def run_summarization(self_agent_id_number: str,
     prompt = generate_prompt(prompt_input, prompt_template, fn_name=sys._getframe().f_code.co_name)
     if engine == 'human':
         chat_round = '[SKIP]'
-        thought = '这个是人类，不需要thought'
-        chat_summarization = '这个是人类，不需要summarization'
+        thought = 'This is a human; no thought process is needed.'
+        chat_summarization = 'This is a human; no summarization is needed.'
 
     else:
         thought, chat_round, chat_summarization = generate_with_response_parser(prompt,

@@ -4,7 +4,7 @@ import os
 class AllResource:
     def __init__(self, save_folder=None)->None:
         '''
-        初始化AllResource类
+        Initializes the AllResource class.
         Input:
             save_folder: str
         Output:
@@ -16,11 +16,11 @@ class AllResource:
 
     def initialize(self, save_folder)->int:
         '''
-        从save_folder中读取AllResource信息
+        Reads AllResource information from save_folder.
         Input:
             save_folder: str
         Output:
-            success_number: int, 成功读取了多少resource
+            success_number: int, how many resources were successfully read.
         '''
         success_number = 0
         for file in os.listdir(save_folder):
@@ -32,7 +32,7 @@ class AllResource:
 
     def append(self, new_resource: Resource)->None:
         '''
-        将new_resource加入AllResource
+        Adds new_resource to AllResource.
         Input:
             new_resource: Resource,
         Output:
@@ -43,7 +43,7 @@ class AllResource:
 
     def get_resource_by_id_number(self, id_number)->Resource:
         '''
-        根据ID Number获得资源
+        Gets a resource by its ID Number.
         Input:
             id_number: str
         Output:
@@ -53,7 +53,7 @@ class AllResource:
 
     def get_all_resource(self)->list:
         '''
-        获得所有的资源列表
+        Gets the list of all resources.
         Input:
             None
         Output:
@@ -63,11 +63,11 @@ class AllResource:
 
     def get_description(self)->str:
         '''
-        获得所有资源的描述
+        Gets the description of all resources.
         Input:
             None
         Output:
-            description: str, 所有资源的描述
+            description: str, description of all resources.
         '''
         description = ''
         for resource in self.get_all_resource():

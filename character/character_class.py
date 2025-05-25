@@ -17,12 +17,12 @@ from character.action_modules.groupchat import run_groupchat, run_speech
 class Character:
     def __init__(self, id_number=None, main_character=False, save_file_folder=None, logger: Logger = None) -> None:
         '''
-        初始化Character类
+        Initializes the Character class.
         Input:
             id_number: str,
             main_character: bool,
-            save_file_folder: str, 如果输入的话，就自动读取这个文件or文件夹下的角色信息
-            logger: Logger, 如果输入，则将该角色的数据输出到logger里
+            save_file_folder: str, If provided, automatically reads character information from this file or folder.
+            logger: Logger, If provided, outputs the character's data to this logger.
         Output:
             None
         '''
@@ -32,7 +32,7 @@ class Character:
             self.logger = None
         self.main_character = main_character
         self.influence = 0
-        self.support_character = ''  # 存放id_number
+        self.support_character = ''  # Stores id_number
         self.objective = ''
         self.name = ''
         self.scratch = ''
@@ -49,7 +49,7 @@ class Character:
 
     def give_influence(self, influence: int) -> None:
         '''
-        赋予角色的影响力数值
+        Assigns an influence value to the character.
         Input:
             influence: int
         Output:
@@ -59,7 +59,7 @@ class Character:
 
     def get_influence(self) -> int:
         '''
-        得到角色的影响力数值
+        Gets the character's influence value.
         Input:
             None
         Output:
@@ -69,7 +69,7 @@ class Character:
 
     def get_objective(self) -> str:
         '''
-        得到角色的目标
+        Gets the character's objective.
         Input:
             None
         Output:
@@ -79,7 +79,7 @@ class Character:
 
     def get_support_character(self) -> str:
         '''
-        获得该角色所支持的角色
+        Gets the character supported by this character.
         Input:
             None
         Output:
@@ -91,7 +91,7 @@ class Character:
             return 'Nobody, you support yourself for the moment.'
     def get_id_number(self) -> str:
         '''
-        获得角色的ID Number
+        Gets the character's ID Number.
         Input:
             None
         Output:
@@ -101,7 +101,7 @@ class Character:
 
     def get_main_character(self) -> bool:
         '''
-        输出角色是否为主要角色
+        Outputs whether the character is a main character.
         Input:
             None
         Output:
@@ -111,7 +111,7 @@ class Character:
 
     def get_relationship(self) -> dict:
         '''
-        获得self角色的关系
+        Gets the relationships of the self character.
         Input:
             None
         Output:
@@ -129,18 +129,18 @@ class Character:
 
     def load(self, save_file_folder) -> None:
         '''
-        从文件中读取角色信息
+        Reads character information from a file.
         Input:
-            save_file_folder: str, 保存的json文件or文件夹
+            save_file_folder: str, the json file or folder where it's saved.
         Output:
             None
         '''
 
-        # 如果是个文件夹
+        # If it's a folder.
         if not save_file_folder.endswith('.json'):
             save_file_folder = os.path.join(save_file_folder, self.id_number + '.json')
 
-        # 确定文件
+        # Confirm file.
         save_file = save_file_folder
         json_data = json.load(open(save_file, encoding='utf-8'))
 
@@ -162,9 +162,9 @@ class Character:
 
     def save(self, save_file_folder) -> None:
         '''
-        将角色信息保存到save_file_folder
+        Saves character information to save_file_folder.
         Input:
-            save_file_folder: str, 角色信息保存地址
+            save_file_folder: str, character information save address.
         Output:
             None
         '''
@@ -190,11 +190,11 @@ class Character:
 
     def get_self_description(self) -> str:
         '''
-        生成一段自我介绍——这段description是Character脑中的对白，所以可以用第二人称呼
+        Generates a self-introduction—this description is a dialogue in the Character's mind, so it can use the second person.
         Input:
             None
         Output:
-            description: str, 只给自己看的描述
+            description: str, a description visible only to oneself.
         '''
         # description = self.name
 
@@ -215,7 +215,7 @@ class Character:
 
     def get_main_belif(self) -> str:
         '''
-        获得分数最高的信念
+        Gets the belief with the highest score.
         Input:
             None
         Output:
@@ -229,13 +229,13 @@ class Character:
                 main_belief = []
 
             if score == main_belief_score:
-                # 把句号去掉
+                # Remove the Chinese period.
                 main_belief.append(belief.strip('。'))
         return '; '.join(main_belief) + '. '
 
     def get_all_belief(self) -> str:
         '''
-        获得角色的所有信念
+        Gets all of the character's beliefs.
         Input:
             None
         Output:
@@ -251,11 +251,11 @@ class Character:
 
     def get_short_description(self) -> str:
         '''
-        生成一段简短的自我介绍，暂时没用
+        Generates a short self-introduction, currently unused.
         Input:
             None
         Output:
-            description: str, 别人能够看到的一行内的简短描述
+            description: str, a one-line short description visible to others.
         '''
         # description = 'This role: %s.'%self.id_number
         description = self.background
@@ -266,8 +266,8 @@ class Character:
                                   len_relationship_change: int):
         '''
         Input:
-            all_action_description: str, self角色能看到的所有行为
-            all_character_description: str, self角色能看到的所有角色的描述信息
+            all_action_description: str, all actions visible to the self character.
+            all_character_description: str, description information of all characters visible to the self character.
         Output:
             reflect_thought, str
             relationship_change: list
@@ -293,7 +293,7 @@ class Character:
 
     def speech(self, action_history_desc, candidates, resources):
         '''
-        让角色最终发言
+        Allows the character to make a final speech.
         '''
         speech, reasoning_process = run_speech(self.id_number,
                                                self.get_self_description(),
@@ -308,7 +308,7 @@ class Character:
 
     def groupchat(self, action_history_desc, candidates, resources, round_description):
         '''
-        群聊
+        Group chat.
         '''
         speech, reasoning_process = run_groupchat(self.id_number,
                                                self.get_self_description(),
@@ -330,14 +330,14 @@ class Character:
             chat_round_num: int,
             requirement_list: list=None):
         '''
-        输入环境，根据是否处于竞争阶段，选择对话的对象
+        Inputs the environment and selects a dialogue partner based on whether it is in a competitive phase.
         Input:
-            environment_summary: str, 对于环境的总结
-            round_description: str, 对于当前轮数的描述
-            action_history_description: str, 行动历史
-            candidates_description: 对于所有候选者的描述
+            environment_summary: str, summary of the environment.
+            round_description: str, description of the current round.
+            action_history_description: str, action history.
+            candidates_description: description of all candidates.
         Output:
-            chosen_candidate: str, 被选中要跟self角色对话的另一个角色的id_number
+            chosen_candidate: str, the id_number of another character selected to converse with the self character.
         '''
         action_history, thought, plan, candidate = run_choose(self.id_number,
                                                            self.get_self_description(),
@@ -371,11 +371,11 @@ class Character:
              candidates: str,
              requirement_list: list=None):
         '''
-        根据投票要求、背景信息、所选角色，来进行结算阶段的投票
+        Casts a vote in the settlement phase based on voting requirements, background information, and selected characters.
         Input:
-            vote_requirement: 投票要求，这里应该会设置为一个文件
-            background_information:
-            candidates:
+            vote_requirement: str, voting requirements, which should be set as a file here.
+            background_information: str
+            candidates: str
         Output:
             choice:
             reasoning_process:
@@ -405,7 +405,7 @@ class Character:
                  chat_history: str,
                  plan: str = None):
         '''
-        和target_candidate_id_number讲话
+        Speaks with target_candidate_id_number.
         Input:
             target_candidate_id_number: str
             target_character_description: str
@@ -416,7 +416,7 @@ class Character:
             new_action_history: list
         '''
         if not plan:
-            plan = '你没什么计划，请根据你的角色设定和你的目标进行回复即可。'
+            plan = 'You do not have a specific plan; please reply based on your character settings and objectives.'
         number_of_action_history, thought, new_action_history = run_facechat(self.id_number,
                                                                              target_candidate_id_number,
                                                                              self.get_self_description(),
@@ -431,13 +431,13 @@ class Character:
 
     def perceive(self, rule_setting: str, all_resource_description: str, action_history_description: str, chat_round_number) -> str:
         '''
-        输入自己的性格，输入环境，输出对于环境的总结，以及自己的思考方案
+        Inputs one's own personality, inputs the environment, outputs a summary of the environment, and one's own thought process.
         Input:
             rule_setting: str,
             all_resource_description: str,
             action_history_description: str,
         Output:
-            environment_description: str, 环境描述的总结
+            environment_description: str, summary of the environment description.
         '''
         environment_description = run_perceive(self.id_number,
                                                self.get_self_description(),
