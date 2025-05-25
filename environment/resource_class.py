@@ -5,10 +5,10 @@ import os
 class Resource:
     def __init__(self, id_number=None, saved_folder=None)->None:
         '''
-        初始化Resource类
+        Initializes the Resource class.
         Input:
-            id_number: str, 赋予一个id_number
-            saved_folder: str, resource存放地址
+            id_number: str, assign an id_number.
+            saved_folder: str, resource storage address.
         Output:
             None
         '''
@@ -29,17 +29,17 @@ class Resource:
     
     def load(self, save_file_folder)->None:
         '''
-        从save_file_folder文件 or 文件夹中读取资源
+        Reads resources from the save_file_folder file or folder.
         Input:
             save_file_folder: str,
         Output:
             None
         '''
-        # 如果是个文件夹
+        # If it's a folder.
         if not save_file_folder.endswith('.json'):
             save_file_folder = os.path.join(save_file_folder, str(self.id_number) + '.json')
 
-        # 准备好json文件
+        # Prepare the JSON file.
         save_file = save_file_folder
         json_data = json.load(open(save_file, encoding='utf-8'))
         self.name = json_data['name']
@@ -51,7 +51,7 @@ class Resource:
 
     def save(self, save_file_folder)->None:
         '''
-        将resource保存到文件
+        Saves the resource to a file.
         Input:
             save_file_folder: str,
         Output:
@@ -72,7 +72,7 @@ class Resource:
 
     def get_description(self):
         '''
-        获得这个资源的描述（大家都可见）
+        Gets the description of this resource (visible to everyone).
         Input:
             None
         Output:

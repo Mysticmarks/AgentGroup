@@ -34,7 +34,7 @@ def run_speech(character_id_number,
 
     if engine == 'human':
 
-        human_prompt = '你作为%s，%s\n请你对所有其他角色发表一些宣言：\n' % (
+        human_prompt = 'As %s, %s\nPlease make some declarations to all other characters:\n' % (
                                                             character_id_number,
                                                             character_description)
         logger.gprint(human_prompt,
@@ -45,7 +45,7 @@ def run_speech(character_id_number,
                       log_type='Human Speaking',
                       log_content=human_prompt)
 
-        reasoning_process = '这个是人类，不需要推理过程'
+        reasoning_process = 'This is a human; no reasoning process is needed.'
         speech = generate_with_response_parser(human_prompt, engine=engine, logger=logger,func_name='human_speech')
 
 
@@ -75,7 +75,7 @@ def run_groupchat(character_id_number,
                  "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
 
     if not support_character:
-        support_character = '你目前不支持任何其他角色，所以你只考虑自己的利益。'
+        support_character = 'You currently do not support any other characters, so you only consider your own interests.'
     prompt_template = "prompt_files/prompt_4_groupchat.txt"
     prompt_input = create_prompt_input(character_id_number,
                                        character_description,
@@ -96,8 +96,8 @@ def run_groupchat(character_id_number,
         return speech, reasoning_process
 
     if engine == 'human':
-        reasoning_process = '这个是人类，不需要推理过程'
-        speech = generate_with_response_parser('你作为%s，请你对所有其他角色发表一些群聊信息：\n' % (character_id_number),
+        reasoning_process = 'This is a human; no reasoning process is needed.'
+        speech = generate_with_response_parser('As %s, please post some group chat messages to all other characters:\n' % (character_id_number),
                                                engine=engine, logger=logger,func_name='human_speech_round')
     else:
         speech, reasoning_process = generate_with_response_parser(prompt, gpt_param=gpt_param, parser_fn=parse_output, engine=engine,

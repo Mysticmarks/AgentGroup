@@ -12,7 +12,7 @@ def run_facechat(source_character_id_number: str,
                 plan: str,
                 engine='gpt4',logger=None):
     '''
-    让source_character基于environment_description和action_history对target_character一次对话
+    Allows the source_character to have a conversation with the target_character based on the environment_description and action_history.
 
     ACTION_SPACE:
     ### SAY
@@ -56,8 +56,8 @@ def run_facechat(source_character_id_number: str,
 
     if engine == 'human':
         number_of_action_history='[SKIP]'
-        thought = '这个是人类，不需要thought'
-        human_prompt = '你作为%s,%s\n和%s,%s\n已经发生了的对话内容：\n%s\n请输入你想说的话：\n' % (source_character_id_number,
+        thought = 'This is a human; no thought process is needed.'
+        human_prompt = 'As %s, %s\nYou are talking to %s, %s\nPrevious conversation content:\n%s\nPlease enter what you want to say:\n' % (source_character_id_number,
                                                                                                                     source_character_description,
                                                                                                                     target_character_id_number,
                                                                                                                     target_character_description,

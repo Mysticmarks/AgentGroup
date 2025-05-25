@@ -13,19 +13,19 @@ def run_choose(self_agent_id_number: str,
             requirement_list=None,
             logger=None):
     '''
-    让source_character根据environment_description和target_character_list来选择target_character
+    Allows the source_character to select a target_character based on the environment_description and target_character_list.
     
     Input:
         self_agent_id_number: str,
         self_agent_description: str,
         environment_summary: str,
-        round_description: str, 描述当前轮数
+        round_description: str, describes the current round number.
         action_history_description: str,
         candidate_description: str,
-        logger: Logger, 已有的logger类
+        logger: Logger, existing logger class.
 
     Output:
-        target_character_id_number: str, 被选中角色的ID Number
+        target_character_id_number: str, ID Number of the selected character.
     '''
 
     gpt_param = {"max_tokens": 500,
@@ -53,9 +53,9 @@ def run_choose(self_agent_id_number: str,
     prompt = generate_prompt(prompt_input, prompt_template, fn_name=sys._getframe().f_code.co_name)
     if engine == 'human':
         action_history = '[SKIP]'
-        thought = '这个是人类，不需要thought'
-        plan = '这个是人类，不需要plan'
-        human_prompt = '你是%s，你的介绍是%s。\n候选人名单：\n%s\n请输入你想对话的角色：\n' % (self_agent_id_number,
+        thought = 'This is a human; no thought process is needed.'
+        plan = 'This is a human; no plan is needed.'
+        human_prompt = 'You are %s, your description is %s.\nCandidate list:\n%s\nPlease enter the ID of the character you want to talk to:\n' % (self_agent_id_number,
                                                                                     self_agent_description,
                                                                                     candidate_description)
         logger.gprint(human_prompt,

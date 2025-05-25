@@ -1,5 +1,5 @@
 '''
-Code copy from Generative Agents
+Code copied from Generative Agents
 '''
 import time
 
@@ -96,7 +96,7 @@ def load_file(file_path):
 #      {"index": 0, "finish_reason": "stop",
 #       "message":
 #           {
-#     "content": "作为C0000，我首先要考虑的是如何利用我的社会资源和影响力来保护自己的公司不被出售，同时也要为可能的公司继承和转型做准备。根据游戏规则，我应该如下行动：\n\n1. 分析当前局势：我是防御阵营的一员，目标是让其他人同意不卖公司。\n\n2. 选择对话角色：我应选择一个不属于防御阵营的角色进行对话。\n\n3. 对话策略：\n   - 第一轮对话：我会选择与C0005对话，因为其所在机构在文化政治报道上有影响力，我可以通过讨论“家族企业继承”的话题，了解他对公司继承的看法，同时评估他对我的态度。\n   - 第二轮对话：如果第一轮顺利，我会继续与C0005讨论“公司治理” 的话题，试图建立同盟关系，为将来可能的合作打下基础。\n\n4. 逐步推进目标：通过逐步引导对话，我会小心翼翼地透露我考虑公司转型和继承的计划，同时试探C0005是否有意愿支持我。\n\n接下来，我的行动目标是：\n\n- 确立对话主题，围绕“家族企业继承”和“公司治理”。\n- 通过对话了解C0005的立场和可能的支持度。\n- 建立起初步的合作关系，为后续的行动打下基础。",
+#     "content": "As C0000, my first consideration is how to use my social resources and influence to protect my company from being sold, while also preparing for possible company succession and transformation. According to the game rules, I should act as follows:\n\n1. Analyze the current situation: I am a member of the defensive camp, and my goal is to get others to agree not to sell the company.\n\n2. Choose a dialogue partner: I should choose a character who is not in the defensive camp for a dialogue.\n\n3. Dialogue strategy:\n   - First round of dialogue: I will choose to talk to C0005 because their institution has influence in cultural and political reporting. By discussing the topic of \"family business succession,\" I can understand their views on company succession and assess their attitude towards me.\n   - Second round of dialogue: If the first round goes smoothly, I will continue to discuss the topic of \"corporate governance\" with C0005, trying to establish an alliance and lay the groundwork for possible future cooperation.\n\n4. Gradually advance goals: By gradually guiding the conversation, I will carefully reveal my plans for company transformation and succession, while also probing C0005's willingness to support me.\n\nNext, my action objectives are:\n\n- Establish dialogue themes centered around \"family business succession\" and \"corporate governance.\"\n- Understand C0005's position and potential level of support through dialogue.\n- Establish a preliminary cooperative relationship to lay the foundation for subsequent actions.",
 #     "role": "assistant", "tool_calls": null
 #           }
 #       }
@@ -105,9 +105,9 @@ def load_file(file_path):
 
 
 def GLM_request_by_API(message_or_prompt, engine, glm_param, api_key, log_dir):
-    client = ZhipuAI(api_key=api_key)  # 填写您自己的APIKey
+    client = ZhipuAI(api_key=api_key)  # Fill in your own APIKey
     response_json = client.chat.completions.create(
-        model=engine,  # 填写需要调用的模型名称
+        model=engine,  # Fill in the name of the model to be called
         messages=[
             {"role": "user", "content": message_or_prompt},
         ],
@@ -217,7 +217,7 @@ def GPT3_request(message_or_prompt, gpt_params, log_dir):
 
 
 def human_request(message_or_prompt):
-    human_message = input(message_or_prompt.strip() + '\n\nHere is your input(请按照要求的格式输入):\n')
+    human_message = input(message_or_prompt.strip() + '\n\nHere is your input (Please enter in the required format):\n')
     response = {'id': 'human_response',
                 'object': 'chat.completion',
                 'created': 1,
@@ -353,7 +353,7 @@ if __name__ == '__main__':
     from config import *
     log_dir = LOG_FOLDER
     logger = Logger(log_dir)
-    message = '今天天气如何'
+    message = 'How is the weather today?'
     # engine = 'gpt4-turbo'
     engine = "glm-4"
     response = generate_with_response_parser(message, engine=engine, logger=logger)

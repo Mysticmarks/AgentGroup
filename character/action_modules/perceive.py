@@ -12,25 +12,25 @@ def run_perceive(self_character_id_number: str,
                 engine='gpt4',logger=None):
     '''
     Input:
-        self_character_id_number: str, self_character的ID Number
-        self_character_description: str, self_character对于自己的描述
-        rule_setting: str, 规则设定
-        all_resource_description: str, self_character能接触到的所有资源的描述
-        action_history_description: str, self_character能看到的行动历史
-        logger: Logger, 已有的日志类
+        self_character_id_number: str, ID Number of self_character.
+        self_character_description: str, self_character's description of themself.
+        rule_setting: str, rule setting.
+        all_resource_description: str, description of all resources self_character can access.
+        action_history_description: str, action history self_character can see.
+        logger: Logger, existing logger class.
     Output:
-        environment_summary: str, self_character对于环境的总结
+        environment_summary: str, self_character's summary of the environment.
     '''
 
-    # 如果是人的话，不需要perceive
+    # If it is a human, perceive is not needed.
     if engine == 'human':
-        return "这是人类，不需要Perceive"
+        return "This is a human; Perceive is not needed."
 
     gpt_param = {"temperature": 0.5, "top_p": 1, "stream": False,
                  "frequency_penalty": 0, "presence_penalty": 0, "stop": None}
 
     if not support_character:
-        support_character = '你目前不支持任何其他角色，所以你只考虑自己的利益。'
+        support_character = 'You currently do not support any other characters, so you only consider your own interests.'
     prompt_template = "prompt_files/prompt_4_perceive.txt"
     prompt_input = create_prompt_input(self_character_id_number,
                                        self_character_description,

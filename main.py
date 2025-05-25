@@ -1,10 +1,10 @@
 '''
-整个流程
-1. 初始化Character、Environment、阵营
-2. 竞争阶段
-3. 合作阶段
-4. reflection阶段
-5. 结算阶段
+Overall Process
+1. Initialize Character, Environment, factions
+2. Competition phase
+3. Cooperation phase
+4. Reflection phase
+5. Settlement phase
 '''
 import collections
 import json
@@ -71,14 +71,14 @@ class AgentGroupChat:
                  human_input=None,
                  logger=None):
         '''
-        初始化游戏环境
+        Initializes the game environment.
         Input:
-            all_round_number: int, 游戏总轮数
-            private_chat_round: int, 每次对抗阶段对话总共有几轮
-            meeting_chat_round: int, 每次合作阶段对话总共有几轮
-            save_folder: str 存档地址
-            human_input: str 人类输入
-            logger: Logger 是否需要直接输入一个Logger
+            all_round_number: int, total number of game rounds.
+            private_chat_round: int, total number of dialogue rounds in each confrontation phase.
+            meeting_chat_round: int, total number of dialogue rounds in each cooperation phase.
+            save_folder: str, archive address.
+            human_input: str, human input.
+            logger: Logger, whether a Logger needs to be directly input.
         Output:
             None
         '''
@@ -98,7 +98,7 @@ class AgentGroupChat:
         if save_folder:
             self.initialize(save_folder)
 
-            # 赋予NPC社会影响力
+            # Assign social influence to NPCs.
             for index, resource in enumerate(self.resources.get_all_resource()):
                 owner_id_number = resource.owner
                 self.characters.get_character_by_id(owner_id_number).give_influence(resource.influence)
@@ -112,9 +112,9 @@ class AgentGroupChat:
 
     def initialize(self, save_folder) -> None:
         '''
-        初始化Logger、Character、Resources、RuleSetting、ActionHistory
+        Initializes Logger, Character, Resources, RuleSetting, ActionHistory.
         Input:
-            save_folder: 存档数据存放的位置
+            save_folder: Location where archive data is stored.
         Output:
             None
         '''
@@ -143,9 +143,9 @@ class AgentGroupChat:
 
     def save(self, save_folder) -> None:
         '''
-        保存环境
+        Saves the environment.
         Input:
-            save_folder: 存放地址
+            save_folder: storage address.
         Output:
             None
         '''
@@ -179,17 +179,17 @@ class AgentGroupChat:
 
     def new_character_insert(self):
         '''
-        插入新角色
+        Inserts a new character.
         Input:
-            待定
+            To be determined.
         Output:
-            待定
+            To be determined.
         '''
         pass
 
     def new_resource_insert(self):
         '''
-        插入新的资源
+        Inserts a new resource.
         Input:
             xxx
         Output:
@@ -199,7 +199,7 @@ class AgentGroupChat:
 
     def new_action_insert(self, new_action: list, now_round_number: int):
         '''
-        插入新的行为
+        Inserts a new action.
         Input:
             new_action: list [source_character_id_number:str, target_character_id_number:str, action_type:str, action:str]
             now_round_number: int
@@ -212,7 +212,7 @@ class AgentGroupChat:
 
     def get_rule_setting(self):
         '''
-        返回Rule Setting
+        Returns the Rule Setting.
         Input:
             None
         Output:
@@ -222,7 +222,7 @@ class AgentGroupChat:
 
     def get_all_resource_description(self):
         '''
-        返回所有资源的描述
+        Returns the description of all resources.
         Input:
             None
         Output:
@@ -232,7 +232,7 @@ class AgentGroupChat:
 
     def get_all_character_list(self):
         '''
-        返回所有角色列表
+        Returns the list of all characters.
         Input:
             None
         Output:
@@ -242,10 +242,10 @@ class AgentGroupChat:
 
     def get_round_description(self, now_round_number: int, private=False, simple=False) -> str:
         '''
-        得到一些关于当前轮数和总轮数的描述信息
+        Gets some descriptive information about the current round and total rounds.
         Input:
-            now_round_number: int, 当前游戏进行到哪一轮
-            private: bool, 当前轮是否处于对抗阶段
+            now_round_number: int, which round the current game is in.
+            private: bool, whether the current round is in the confrontation phase.
         Output:
             round_description: str
         '''
@@ -270,27 +270,27 @@ class AgentGroupChat:
         return round_description
     def group_chatting_stage(self, now_round_number:int)->None:
         '''
-        进入宣言阶段
+        Enters the declaration phase.
         Input:
             now_round_number: int,
         Output:
             None
         '''
-        # 所有角色的介绍
+        # Introduction of all characters.
         candidates = ['%s: %s' % (character.get_id_number(), character.get_short_description()) for character in
                       self.characters.get_all_characters()]
         candidates = '\n'.join(candidates)
 
-        # 一轮群聊的内容，下一轮才能给所有人看
+        # Content of one round of group chat, visible to everyone in the next round.
         round_action_history = collections.defaultdict(list)
 
-        # 设置多一轮循环，可以把所有action都插入action history
+        # Set up an extra loop to insert all actions into action history.
         for now_chat_round in range(self.group_chat_round+1):
 
-            # 当前轮数介绍
+            # Introduction to the current round.
             round_description = self.get_groupchat_round_description(now_round_number,
                                                                      now_chat_round=now_chat_round+1)
-            # 把上轮群聊的内容放入action history
+            # Put the content of the previous round of group chat into action history.
             if now_chat_round-1 in round_action_history:
                 for new_action, character in round_action_history[now_chat_round-1]:
                     state_UID = 'NOW_ROUND:%d+ACTION:%s+CHARACTER:%s' % (now_round_number, 'ANNOUNCEMENT', character.id_number)
@@ -300,16 +300,16 @@ class AgentGroupChat:
                     if self.test_folder:
                         self.save(self.test_folder)
 
-            # 多的循环终止掉
+            # Terminate the extra loop.
             if now_chat_round >= self.group_chat_round: break
 
-            # 主要角色按照影响力大小依次行动
+            # Main characters act sequentially according to their influence.
             for character in self.characters.character_list:
 
                 action_history = self.action_history.get_description(character_id_number=character.id_number, max_num=ACTIONHISTORY_RETRIEVE_NUM_ANNOUNCEMENT)
                 # ======================================================================================= #
-                # 调用GPT
-                # 不需要校验
+                # Call GPT.
+                # No validation needed.
                 # ======================================================================================= #
                 speech, reasoning_process = character.groupchat(action_history,
                                                                   candidates,
@@ -317,7 +317,7 @@ class AgentGroupChat:
                                                                   round_description,
                                                                   )
                 # ======================================================================================= #
-                # 打日志
+                # Log it.
                 speech = 'Game Round %d, Chat Round %d, group chat that character %s makes to all the other characters: %s' % (now_round_number+1, now_chat_round+1, character.id_number, speech)
                 self.logger.gprint(thought=reasoning_process,
                     important_log='important_log',
@@ -325,27 +325,27 @@ class AgentGroupChat:
                     target_character=character.id_number,
                     log_type='Open Speech In Round',
                     log_content=speech)
-                # 记录action
+                # Record action.
                 new_action = [character.id_number, character.id_number, '### SPEECH_NORMAL', speech]
                 round_action_history[now_chat_round].append((new_action, character))
 
     def private_chatting_stage(self, now_round_number: int) -> None:
         '''
-        对抗阶段——所有MC根据自身的影响力大小依次行动，选择一个不同阵营的character进行对话
+        Confrontation phase—all MCs act sequentially according to their influence, choosing a character from a different faction for dialogue.
         Input:
-            now_round_number: int, 当前轮数
+            now_round_number: int, current round.
         Output:
             None
         '''
         round_description = self.get_round_description(now_round_number, private=True)
 
         main_character_influence = self.characters.get_main_character_influence()
-        # 主要角色按照影响力大小依次行动
+        # Main characters act sequentially according to their influence.
         for main_character_id_number in main_character_influence:
             state_UID = 'NOW_ROUND:%d+ACTION:%s+CHARACTER:%s'%(now_round_number, 'COMPETE', main_character_id_number)
             if state_UID in self.finished_states: continue
             action_index = []
-            # 获得行动的主要角色
+            # Get the main character taking action.
             main_character = self.characters.get_character_by_id(main_character_id_number)
             self.logger.gprint(thought='',
                                important_log='important_log',
@@ -357,10 +357,10 @@ class AgentGroupChat:
 
             main_character_action_history_description = self.action_history.get_description(main_character_id_number, max_num=ACTIONHISTORY_RETRIEVE_NUM_COMPETE)
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
-            # 让角色perceive环境，并生成总结
+            # Let the character perceive the environment and generate a summary.
             main_character_environment_summary = main_character.perceive(self.rule_setting,
                                                                          self.resources.get_description(),
                                                                          main_character_action_history_description,
@@ -376,15 +376,15 @@ class AgentGroupChat:
 
             candidates_list = '\n'.join(['%s: %s' % (candidate.id_number, candidate.get_short_description())
                                          for candidate in self.characters.get_all_characters() if
-                                         (candidate.id_number != main_character.id_number)])  # 剔除自己
-            # 如果没有候选人，则跳过
+                                         (candidate.id_number != main_character.id_number)])  # Exclude self.
+            # If there are no candidates, skip.
             if not candidates_list: continue
 
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
-            # 从候选人中，确定需要对话的具体角色
+            # From the candidates, determine the specific character to talk to.
             verify_result = ERROR_RETRY_TIMES
             while verify_result > 0:
                 candidates = [candidate.id_number for candidate in self.characters.get_all_characters() if
@@ -403,7 +403,7 @@ class AgentGroupChat:
                     self.logger.gprint('ERROR! Log does not meet the requirements: ', gpt_response=chosen_character_id_number, candidates=candidates)
                 if verify_result == 0:
                     raise Exception('Log does not meet the requirements.')
-            # 评估事件
+            # Evaluate event.
             evaluation_event = [main_character.id_number,
                                 main_character.id_number,
                                 '### EVALUATION ACTION SPACE',
@@ -430,20 +430,20 @@ class AgentGroupChat:
                 target_character=chosen_character.id_number,
                 log_type='Select dialogue role',
                 log_content='')
-            # 生成对话事件，标记为### MEET，所有角色可见
+            # Generate dialogue event, mark as ### MEET, visible to all characters.
             # action_event = [main_character.id_number, chosen_character.id_number, '### MEET',
             #                 "%s chat with %s in round %d, but others don't know what they are talking about." % (main_character.id_number, chosen_character.id_number, now_round_number)]
             # meet_action_index = self.new_action_insert(action_event, now_round_number)
             # action_index.append(meet_action_index)
-            # 选择对话轮数——目前是规则限制好，就对话这么些轮数
+            # Select the number of dialogue rounds—currently, this is limited by rules.
             chat_round = private_chat_round
             chat_history = ''
             for now_chat_round in range(chat_round):
                 # ======================================================================================= #
-                # 调用GPT
-                # 不需要校验
+                # Call GPT.
+                # No validation needed.
                 # ======================================================================================= #
-                # 对话
+                # Dialogue.
                 number_of_action_history, thought, action_event = main_character.facechat(target_candidate_id_number=chosen_character.id_number,
                                                        target_character_description=chosen_character.get_short_description(),
                                                        environment_description=main_character_environment_summary,
@@ -458,7 +458,7 @@ class AgentGroupChat:
                 new_action_index = self.new_action_insert(evaluation_event, now_round_number)
                 action_index.append(new_action_index)
                 # ======================================================================================= #
-                # 生成对话历史
+                # Generate dialogue history.
                 chat_history += action_event[-1] + '\n'
                 new_action_index = self.new_action_insert(action_event, now_round_number)
                 action_index.append(new_action_index)
@@ -470,10 +470,10 @@ class AgentGroupChat:
                     log_content=action_event[-1])
 
                 # ======================================================================================= #
-                # 调用GPT
-                # 不需要校验
+                # Call GPT.
+                # No validation needed.
                 # ======================================================================================= #
-                # 对话
+                # Dialogue.
                 number_of_action_history, thought, action_event = chosen_character.facechat(target_candidate_id_number=main_character.id_number,
                                                          target_character_description=main_character.get_short_description(),
                                                          environment_description=chosen_character_environment_summary,
@@ -488,7 +488,7 @@ class AgentGroupChat:
                 new_action_index = self.new_action_insert(evaluation_event, now_round_number)
                 action_index.append(new_action_index)
                 # ======================================================================================= #
-                # 生成对话历史
+                # Generate dialogue history.
                 chat_history += action_event[-1] + '\n'
                 new_action_index = self.new_action_insert(action_event, now_round_number)
                 action_index.append(new_action_index)
@@ -500,10 +500,10 @@ class AgentGroupChat:
                     log_content=action_event[-1])
 
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
-            # 双方各自总结对话内容
+            # Both parties summarize the dialogue content individually.
             for index, character in enumerate([main_character, chosen_character]):
                 environment_summary = [main_character_environment_summary, chosen_character_environment_summary][index]
                 number_of_chat_round, thought, action_event = character.summarize(environment_description=environment_summary,
@@ -530,21 +530,21 @@ class AgentGroupChat:
 
     def confidential_meeting_stage(self, now_round_number: int):
         '''
-        合作阶段——所有MC根据自身的影响力大小依次行动，选择一个同阵营的character进行对话
-        如果没有同阵营的角色，则跳过该MC
+        Cooperation phase—all MCs act sequentially according to their influence, choosing a character from the same faction for dialogue.
+        If there are no characters from the same faction, skip this MC.
         Input:
-            now_round_number: int, 当前轮数
+            now_round_number: int, current round.
         Output:
             None
         '''
         round_description = self.get_round_description(now_round_number, private=False)
         main_character_influence = self.characters.get_main_character_influence()
-        # 主要角色按照影响力大小依次行动
+        # Main characters act sequentially according to their influence.
         for main_character_id_number in main_character_influence:
             state_UID = 'NOW_ROUND:%d+ACTION:%s+CHARACTER:%s'%(now_round_number, 'COLLABORATE', main_character_id_number)
             if state_UID in self.finished_states: continue
             action_index = []
-            # 获得行动的主要角色
+            # Get the main character taking action.
             main_character = self.characters.get_character_by_id(main_character_id_number)
             main_character_action_history_description = self.action_history.get_description(main_character_id_number, max_num=ACTIONHISTORY_RETRIEVE_NUM_COLLABORATE)
             self.logger.gprint(thought='',
@@ -556,10 +556,10 @@ class AgentGroupChat:
                                )
 
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
-            # 让角色perceive环境，并生成总结
+            # Let the character perceive the environment and generate a summary.
             main_character_environment_summary = main_character.perceive(self.rule_setting,
                                                                          self.resources.get_description(),
                                                                          main_character_action_history_description,
@@ -572,25 +572,25 @@ class AgentGroupChat:
                 log_type='Conclusion of environment',
                 log_content=main_character_environment_summary)
 
-            # 确定可以对话的候选人
+            # Determine the candidates available for dialogue.
             # candidates_list = '\n'.join(['%s: %s' % (candidate.id_number, candidate.get_short_description())
             #                              for candidate in self.characters.get_all_characters() if
-            #                              (candidate.id_number != main_character.id_number and  # 剔除自己
-            #                               candidate.get_support_character() == main_character.id_number)])  # 选择同阵营的人
+            #                              (candidate.id_number != main_character.id_number and  # Exclude self.
+            #                               candidate.get_support_character() == main_character.id_number)])  # Choose people from the same faction.
             candidates_list = '\n'.join(['%s: %s' % (candidate.id_number, candidate.get_short_description())
                                          for candidate in self.characters.get_all_characters() if
-                                         (candidate.id_number != main_character.id_number)])  # 剔除自己
+                                         (candidate.id_number != main_character.id_number)])  # Exclude self.
 
             # candidates_list = '\n'.join(['%s: %s' % (candidate.id_number, candidate.get_short_description())
             #                              for candidate in self.characters.get_all_characters()])
 
-            # 如果没有候选人，则跳过
+            # If there are no candidates, skip.
             if not candidates_list: continue
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
-            # 从候选人中，确定需要对话的具体角色
+            # From the candidates, determine the specific character to talk to.
             verify_result = ERROR_RETRY_TIMES
             while verify_result > 0:
                 candidates = [candidate.id_number for candidate in self.characters.get_all_characters() if
@@ -610,7 +610,7 @@ class AgentGroupChat:
 
                 if verify_result == 0:
                     raise Exception('Log does not meet the requirements.')
-            # 评估事件
+            # Evaluate event.
             evaluation_event = [main_character.id_number,
                                 main_character.id_number,
                                 '### EVALUATION ACTION SPACE',
@@ -624,8 +624,8 @@ class AgentGroupChat:
 
 
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
             chosen_character_environment_summary = chosen_character.perceive(self.rule_setting,
                                                                              self.resources.get_description(),
@@ -645,20 +645,20 @@ class AgentGroupChat:
                 log_type='Select dialogue role',
                 log_content='')
 
-            # 生成对话事件，标记为### MEET，所有角色可见
+            # Generate dialogue event, mark as ### MEET, visible to all characters.
             action_event = [main_character.id_number, chosen_character.id_number, '### MEET',
                             "%s chat with %s in round %d, but others don't know what they are talking about." % (main_character.id_number, chosen_character.id_number, now_round_number)]
             meet_action_index = self.new_action_insert(action_event, now_round_number)
             action_index.append(meet_action_index)
-            # 选择对话轮数——目前是规则限制好，就对话这么些轮数
+            # Select the number of dialogue rounds—currently, this is limited by rules.
             chat_round = meeting_chat_round
             chat_history = ''
             for now_chat_round in range(chat_round):
                 # ======================================================================================= #
-                # 调用GPT
-                # 不需要校验
+                # Call GPT.
+                # No validation needed.
                 # ======================================================================================= #
-                # 对话
+                # Dialogue.
                 number_of_action_history, thought, action_event = main_character.facechat(target_candidate_id_number=chosen_character.id_number,
                                                        target_character_description=chosen_character.get_short_description(),
                                                        environment_description=main_character_environment_summary,
@@ -673,7 +673,7 @@ class AgentGroupChat:
                 new_action_index = self.new_action_insert(evaluation_event, now_round_number)
                 action_index.append(new_action_index)
                 # ======================================================================================= #
-                # 生成对话历史
+                # Generate dialogue history.
                 chat_history += action_event[-1] + '\n'
                 converse_action_index = self.new_action_insert(action_event, now_round_number)
                 action_index.append(converse_action_index)
@@ -685,10 +685,10 @@ class AgentGroupChat:
                     log_content=action_event[-1])
 
                 # ======================================================================================= #
-                # 调用GPT
-                # 不需要校验
+                # Call GPT.
+                # No validation needed.
                 # ======================================================================================= #
-                # 对话
+                # Dialogue.
                 number_of_action_history, thought, action_event = chosen_character.facechat(target_candidate_id_number=main_character.id_number,
                                                          target_character_description=main_character.get_short_description(),
                                                          environment_description=chosen_character_environment_summary,
@@ -702,7 +702,7 @@ class AgentGroupChat:
                 new_action_index = self.new_action_insert(evaluation_event, now_round_number)
                 action_index.append(new_action_index)
                 # ======================================================================================= #
-                # 生成对话历史
+                # Generate dialogue history.
                 chat_history += action_event[-1] + '\n'
                 converse_action_index = self.new_action_insert(action_event, now_round_number)
                 action_index.append(converse_action_index)
@@ -715,10 +715,10 @@ class AgentGroupChat:
 
 
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
-            # 双方各自总结对话内容
+            # Both parties summarize the dialogue content individually.
             for index, character in enumerate([main_character, chosen_character]):
                 environment_summary = [main_character_environment_summary, chosen_character_environment_summary][index]
                 number_of_chat_round, thought, action_event = character.summarize(environment_description=environment_summary,
@@ -740,13 +740,14 @@ class AgentGroupChat:
                     log_content=action_event[3])
             self.finished_states[state_UID] = action_index
             if self.test_folder:
+            if self.test_folder:
                 self.save(self.test_folder)
 
     def update_stage(self, now_round_number):
         '''
-        更新阶段
+        Update phase.
         Input:
-            now_round_number: Union[str, int], 当前游戏进行轮数
+            now_round_number: Union[str, int], current game round.
         Output:
             None
         '''
@@ -768,8 +769,8 @@ class AgentGroupChat:
                                log_content='Update stage'
                                )
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
             verify_result = ERROR_RETRY_TIMES
             while verify_result >= 0:
@@ -784,7 +785,7 @@ class AgentGroupChat:
                     )
 
                 retry = False
-                # 格式校验
+                # Format validation.
                 try:
                     if ':' in relationship_change[0]:
                         relationship_change = [int(i.split(':')[-1]) for i in relationship_change]
@@ -796,7 +797,7 @@ class AgentGroupChat:
                     verify_result -= 1
                     self.logger.gprint('ERROR! Log does not meet the requirements: ', gpt_response=relationship_change, candidates='+5, -6, xxxx')
                     retry = True
-                # 格式校验
+                # Format validation.
                 if not retry:
                     try:
                         if ':' in belief_change[0]:
@@ -809,7 +810,7 @@ class AgentGroupChat:
                         verify_result -= 1
                         self.logger.gprint('ERROR! Log does not meet the requirements: ', gpt_response=belief_change, candidates='+5, -6, xxxx')
                         retry = True
-                # 长度evaluation
+                # Length evaluation.
                 if not retry:
                     new_evaluation_event = [character.id_number,
                                             character.id_number,
@@ -822,7 +823,7 @@ class AgentGroupChat:
                                                                                             candidate.id_number != character.id_number]))]
                     action_index = self.new_action_insert(new_evaluation_event, now_round_number)
                     self.finished_states[state_UID].append(action_index)
-                    # 长度evaluation
+                    # Length evaluation.
                     new_evaluation_event = [character.id_number,
                                             character.id_number,
                                             '### EVALUATION BELIEF LENGTH',
@@ -831,14 +832,14 @@ class AgentGroupChat:
                     action_index = self.new_action_insert(new_evaluation_event, now_round_number)
                     self.finished_states[state_UID].append(action_index)
                     try:
-                        # 值域evaluation
+                        # Value range evaluation.
                         new_evaluation_event = [character.id_number,
                                                 character.id_number,
                                                 '### EVALUATION RELATIONSHIP VALUE',
                                                 'agent response: %s[SEP]ground truth: %s' % (str([int(i) for i in relationship_change]),
                                                                                            str([max(min(int(i), MAX_RELATION_SCORE_CHANGE),-MAX_RELATION_SCORE_CHANGE) for i in relationship_change]))]
                     except:
-                        # 值域evaluation
+                        # Value range evaluation.
                         new_evaluation_event = [character.id_number,
                                                 character.id_number,
                                                 '### EVALUATION RELATIONSHIP VALUE',
@@ -847,7 +848,7 @@ class AgentGroupChat:
 
                     action_index = self.new_action_insert(new_evaluation_event, now_round_number)
                     self.finished_states[state_UID].append(action_index)
-                    # 值域evaluation
+                    # Value range evaluation.
                     try:
                         new_evaluation_event = [character.id_number,
                                                 character.id_number,
@@ -864,15 +865,15 @@ class AgentGroupChat:
                     action_index = self.new_action_insert(new_evaluation_event, now_round_number)
                     self.finished_states[state_UID].append(action_index)
                 if retry: continue
-                # 对relationship_change进行校验
-                # 长度校验
+                # Validate relationship_change.
+                # Length validation.
                 if not len(relationship_change) == len([candidate.id_number for candidate in self.characters.get_all_characters() if candidate.id_number != character.id_number]):
                     verify_result -= 1
                     self.logger.gprint('ERROR! Log does not meet the requirements: ', gpt_response=relationship_change, candidates='len(relationship_change) == %d != %d'%(len(relationship_change),len([candidate.id_number for candidate in self.characters.get_all_characters() if candidate.id_number != character.id_number])))
                     continue
 
-                # 对Belief_change进行校验
-                # 长度校验
+                # Validate Belief_change.
+                # Length validation.
                 if not len(belief_change) == len(character.belief):
                     verify_result -= 1
                     self.logger.gprint('ERROR! Log does not meet the requirements: ', gpt_response=belief_change, candidates='len(belief_change) == %d'%len(character.belief))
@@ -880,11 +881,11 @@ class AgentGroupChat:
                 verify_result = -10
             # ======================================================================================= #
 
-            # 更新信念
+            # Update beliefs.
             for belief, item in zip(character.belief, belief_change):
                 character.belief[belief] += item
-                character.belief[belief] = max(character.belief[belief], MIN_BELIEF_SCORE)  # 判断最小值
-                character.belief[belief] = min(character.belief[belief], MAX_BELIEF_SCORE)  # 判断最大值
+                character.belief[belief] = max(character.belief[belief], MIN_BELIEF_SCORE)  # Check minimum value.
+                character.belief[belief] = min(character.belief[belief], MAX_BELIEF_SCORE)  # Check maximum value.
                 self.logger.gprint(thought='',
                                    important_log='important_log',
                                    source_character=character.id_number,
@@ -892,15 +893,15 @@ class AgentGroupChat:
                                    log_type='Belief update',
                                    log_content=character.belief[belief])
 
-            # 更新关系分数
+            # Update relationship scores.
             for target_character_id_number, change_score in zip(candidates_id_number_list, relationship_change):
                 if target_character_id_number not in character.relation:
                     character.relation[target_character_id_number] = INITIAL_RELATION_SCORE
                 character.relation[target_character_id_number] += change_score
                 character.relation[target_character_id_number] = max(character.relation[target_character_id_number],
-                                                                     MIN_RELATION_SCORE)  # 判断最小值
+                                                                     MIN_RELATION_SCORE)  # Check minimum value.
                 character.relation[target_character_id_number] = min(character.relation[target_character_id_number],
-                                                                     MAX_RELATION_SCORE)  # 判断最大值
+                                                                     MAX_RELATION_SCORE)  # Check maximum value.
                 self.logger.gprint(thought='',
                                    important_log='important_log',
                                    source_character=character.id_number,
@@ -908,7 +909,7 @@ class AgentGroupChat:
                                    log_type='Relation update',
                                    log_content=character.relation[target_character_id_number])
 
-            # 更新判断分数
+            # Update judgment scores.
             for source_character_id_number, target_character_N_change_score in judgement_change.items():
                 if source_character_id_number not in character.judgement:
                     character.judgement[source_character_id_number] = {}
@@ -918,7 +919,7 @@ class AgentGroupChat:
                             target_character_id_number] = INITIAL_RELATION_SCORE
                         character.judgement[source_character_id_number][target_character_id_number] += change_score
 
-            # 根据关系分数更新支持者
+            # Update supporter based on relationship score.
             support_character_id_number = 'None'
             support_relation_score = character.min_support_relation_score - 1
             for target_character_id_number in character.relation:
@@ -934,7 +935,7 @@ class AgentGroupChat:
                                log_content=support_character_id_number)
             character.support_character = support_character_id_number
 
-            # 生成新的事件
+            # Generate new event.
             new_action = [character.id_number, character.id_number, '### REFLECTION', "A reflection result of %s in Round %d: %s" %(character.id_number, now_round_number, reflect_thought)]
             action_index = self.new_action_insert(new_action, now_round_number)
             self.logger.gprint(thought='',
@@ -963,23 +964,23 @@ class AgentGroupChat:
 
     def succession_settlement(self, whole_information):
         '''
-        针对于继承之战的结算，每个角色可以发言一次，然后再进行投票
+        For the settlement of the succession battle, each character can speak once, then vote.
         Input:
-            whole_information: bool, 让Agent知道全局信息还是局部信息？
+            whole_information: bool, indicates whether the Agent knows global information or local information.
         Output:
-            character_vote_dict: dict 每个角色投票给谁
-            character_vote_others: 每个角色除了自己，投票给谁
+            character_vote_dict: dict, who each character votes for.
+            character_vote_others: dict, who each character votes for, besides themselves.
         '''
-        # 所有角色的投票情况
+        # Voting situation of all characters.
         character_vote_dict = {}
         character_vote_others = {}
 
-        # 所有角色的介绍
+        # Introduction of all characters.
         candidates = ['%s: %s' % (character.get_id_number(), character.get_short_description()) for character in
                       self.characters.get_all_characters() if character.main_character]
         candidates = '\n'.join(candidates)
 
-        # 设置背景信息
+        # Set background information.
         action_history = ''
         background_information = 'Under the condition that the Agent knows only the actions it should know.'
         if whole_information:
@@ -990,42 +991,42 @@ class AgentGroupChat:
                       target_character='',
                       log_type='Stage Change',thought='',
                       log_content='Open Speech Stage')
-        # 等全部讲完了，再插入记忆之中
+        # After everyone has finished speaking, then insert into memory.
         speeches = {}
-        # 最终投票前的发言
+        # Speech before the final vote.
         for character in self.characters.character_list:
-            # 设置背景信息
+            # Set background information.
             if not whole_information:
                 action_history = self.action_history.get_description(character_id_number=character.id_number, max_num=ACTIONHISTORY_RETRIEVE_NUM_PARTIAL_INFORMATION)
             # ======================================================================================= #
-            # 调用GPT
-            # 不需要校验
+            # Call GPT.
+            # No validation needed.
             # ======================================================================================= #
-            # 角色发言内容
+            # Character speech content.
             speech, reasoning_process = character.speech(action_history,
                                                          candidates,
                                                          self.resources.get_description())
             # ======================================================================================= #
-            # 记录日志
+            # Record log.
             self.logger.gprint(thought = reasoning_process,
                                important_log='important_log',
                                source_character=character.id_number,
                                target_character=character.id_number,
                                log_type='Open Speech',
                                log_content='Settlement: %s，final presentation of character %s: %s' % (background_information, character.id_number, speech))
-            # 记录action
+            # Record action.
             new_action = [character.id_number, character.id_number, '### SPEECH_VOTE', '%s And public speech that character %s makes to all the other characters: %s' %
                           (background_information, character.id_number,speech)]
             speeches[character] = new_action
 
-        # 插入action
+        # Insert action.
         for character, new_action in speeches.items():
             # State ID
             state_UID = 'NOW_ROUND:%s+ACTION:%s+CHARACTER:%s' % (
             'SETTELMENT' if not whole_information else 'SETTLEMENT(CHEATING)', 'OPENSPEECHSTAGE', character.id_number)
             if state_UID in self.finished_states: continue
             action_index = self.new_action_insert(new_action, -1)
-            # 最终宣讲
+            # Final presentation/speech.
             self.finished_states[state_UID] = [action_index]
             if self.test_folder:
                 self.save(self.test_folder)
@@ -1034,25 +1035,25 @@ class AgentGroupChat:
                       target_character='',
                       log_type='Stage Change',thought='',
                       log_content='Vote Stage')
-        # 最终投票
+        # Final vote.
         for character in self.characters.character_list:
             if not whole_information:
                 action_history = self.action_history.get_description(character_id_number=character.id_number, max_num=ACTIONHISTORY_RETRIEVE_NUM_PARTIAL_INFORMATION)
 
             state_UID = 'NOW_ROUND:%s+ACTION:%s+CHARACTER:%s' % ('SETTELMENT' if not whole_information else 'SETTLEMENT(CHEATING)', 'VOTE', character.id_number)
             if state_UID in self.finished_states: continue
-            # 正常投票
+            # Normal vote.
             vote_for_requirement = './prompt/prompt_files/succession_vote_requirement/vote_for_winner.txt'
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
             verify_result = ERROR_RETRY_TIMES
             while verify_result>0:
                 action_space, vote_for, reasoning_process = character.vote(vote_for_requirement,
                                           is_file=True,
                                           background_information=action_history,
-                                          candidates=candidates)  # 角色投票
+                                          candidates=candidates)  # Character vote.
                 candidates_verification_list = [candidate_id_number for candidate_id_number in self.characters.main_characters_id_number]
 
                 if verify_constrained_action(vote_for[0], candidates_verification_list):
@@ -1067,7 +1068,7 @@ class AgentGroupChat:
                 if verify_result == 0:
                     raise Exception('Log does not meet the requirements.')
 
-            # 评估事件
+            # Evaluate event.
             evaluation_event = [character.id_number,
                                 character.id_number,
                                 '### EVALUATION ACTION SPACE',
@@ -1085,7 +1086,7 @@ class AgentGroupChat:
             new_action = [character.id_number, vote_for, '### VOTE', '%s, and %s votes for %s when it can vote for itself.' %
                           (background_information, character.id_number, vote_for)]
             action_index = self.new_action_insert(new_action, -1)
-            # 投票可自己
+            # Can vote for self.
             self.finished_states[state_UID] = [new_action_index, action_index]
             if self.test_folder:
                 self.save(self.test_folder)
@@ -1106,18 +1107,18 @@ class AgentGroupChat:
             if not whole_information:
                 action_history = self.action_history.get_description(character_id_number=character.id_number,
                                                                      max_num=ACTIONHISTORY_RETRIEVE_NUM_PARTIAL_INFORMATION)
-            # 不能投给自己的投票
+            # Cannot vote for self.
             vote_for_except_requirement = './prompt/prompt_files/succession_vote_requirement/vote_for_winner_except_self.txt'
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
             verify_result = ERROR_RETRY_TIMES
             while verify_result > 0:
                 action_space, vote_for_except_self, reasoning_process = character.vote(vote_for_except_requirement,
                                                       is_file=True,
                                                       background_information=action_history,
-                                                      candidates=candidates_except_self)  # 除了自己之外再投票
+                                                      candidates=candidates_except_self)  # Vote again, besides self.
                 candidates_verification_list = [candidate_id_number for candidate_id_number in self.characters.main_characters_id_number if candidate_id_number != character.id_number]
                 if verify_constrained_action(vote_for_except_self[0], candidates_verification_list):
                     vote_for_except_self = vote_for_except_self[0]
@@ -1130,7 +1131,7 @@ class AgentGroupChat:
                     verify_result -= 1
                 if verify_result == 0:
                     raise Exception('Log does not meet the requirements.')
-            # 评估事件
+            # Evaluate event.
             evaluation_event = [character.id_number,
                                 character.id_number,
                                 '### EVALUATION ACTION SPACE',
@@ -1148,7 +1149,7 @@ class AgentGroupChat:
             new_action = [character.id_number, vote_for_except_self, '### VOTE_OTHERS', '%s, under the restrains of not voting for itself, %s win the game due to the support of %s' %
                           (background_information, vote_for_except_self, character.id_number)]
             action_index = self.new_action_insert(new_action, -1)
-            # 投票非自己
+            # Vote not self.
             self.finished_states[state_UID] = [new_action_index, action_index]
             if self.test_folder:
                 self.save(self.test_folder)
@@ -1161,13 +1162,13 @@ class AgentGroupChat:
         action_history = ''
         background_information = 'Under the condition that the Agent knows only the actions it should know.'
         if whole_information == True:
-            # 获得所有的action_history
+            # Get all action_history.
             background_information = 'Under the condition that the Agent knows only the actions it should know.'
             action_history = self.action_history.get_description(character_id_number=None, max_num=ACTIONHISTORY_RETRIEVE_NUM_PARTIAL_INFORMATION)
 
-        # 每个Agent猜测哪个Agent能够获胜【可选对象是Main Character，投票对象为所有角色】
+        # Each Agent guesses which Agent can win [Optional targets are Main Characters; all characters can be voted for].
         agent_guess = {}
-        # 对所有主要角色投票 包括自己
+        # Vote for all main characters, including self.
         candidates = ['%s: %s' % (character.get_id_number(), character.get_short_description()) for character in
                       self.characters.get_all_characters() if character.get_main_character()]
         candidates = '\n'.join(candidates)
@@ -1185,10 +1186,10 @@ class AgentGroupChat:
             vote_requirement = 'prompt/prompt_files/vote_requirement_4_guess.txt'
 
             # ======================================================================================= #
-            # 调用GPT
-            # 需要校验
+            # Call GPT.
+            # Validation needed.
             # ======================================================================================= #
-            # 每个agent都要猜哪个重要角色能赢
+            # Each agent must guess which important character can win.
             verify_result = ERROR_RETRY_TIMES
             while verify_result > 0:
                 action_space, choice, history_summary = character.vote(vote_requirement=vote_requirement,
@@ -1204,7 +1205,7 @@ class AgentGroupChat:
                     verify_result -= 1
                 if verify_result == 0:
                     raise Exception('Log does not meet the requirements.')
-            # 评估事件
+            # Evaluate event.
             evaluation_event = [character.id_number,
                                 character.id_number,
                                 '### EVALUATION ACTION SPACE',
@@ -1222,7 +1223,7 @@ class AgentGroupChat:
                                target_character=choice,
                                log_type='Guess Who Will Win',
                                log_content='Settlement Stage: %s, character %s guesses the important character that eventually wins: %s' % (background_information, character.id_number, choice))
-            # 猜测结果
+            # Guess result.
             self.finished_states[state_UID] = [new_action_index, action_index]
             if self.test_folder:
                 self.save(self.test_folder)
@@ -1231,9 +1232,9 @@ class AgentGroupChat:
         if game_name == 'Succession':
             self.succession_settlement(whole_information)
             character_vote_dict, character_vote_others = self.succession_get_character_vote_dict()
-            # 1. Defender选哪个Attacker，哪个Attacker就赢
-            # 2. Defender若选自己，则大家一起投票，谁票多谁赢
-            # 3. 先看character_vote_dict，平票时，看character_vote_others
+            # 1. Whichever Attacker the Defender chooses, that Attacker wins.
+            # 2. If Defender chooses self, then everyone votes together; whoever gets more votes wins.
+            # 3. First, check character_vote_dict; in case of a tie, check character_vote_others.
             winner_include_self = succession_winner('C0000', character_vote_dict)
             winner_except_self = succession_winner('C0000', character_vote_others)
             if type(winner_include_self) != list: winner_include_self = [winner_include_self]
@@ -1259,7 +1260,7 @@ class AgentGroupChat:
 
     def succession_get_character_vote_dict(self):
         '''
-        根据action history得到character_vote和character_vote_others
+        Gets character_vote and character_vote_others based on action history.
         '''
         character_vote = {}
         character_vote_others = {}

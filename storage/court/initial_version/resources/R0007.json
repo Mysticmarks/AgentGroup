@@ -1,7 +1,7 @@
 {
     "name": "Gas Station Murder Case",
     "id_number": "R0007",
-    "description": "This case revolves around a murder that transpired on September 3, 2011, within a gas station premises. The victim, who served as the station manager, was discovered deceased at his residence, with the cause of death attributed to excessive blood loss from stab wounds. The accused, Kudo (C0002), an employee of the gas station, faces charges for allegedly perpetrating the murder of the station manager at their shared workplace.",
+    "description": "This case revolves around a murder that occurred on September 3, 2011, at a gas station. The victim, the station manager, was found dead at his residence; the cause of death was excessive blood loss from stab wounds. The accused, Kudo (C0002), a gas station employee, faces charges for allegedly murdering the station manager at their workplace.",
     "influence": 100,
     "owner": "C0007",
     "topic": "Murder case[TOPIC_SEP]Criminal cases[TOPIC_SEP]Court[TOPIC_SEP]Background story"

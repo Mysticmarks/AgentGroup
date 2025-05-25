@@ -49,11 +49,11 @@ def gen_sign_params(data):
     params['app_id'] = data["app_id"]
     params['secret_id'] = data['secret_id']
     params['query_id'] = data['query_id']
-    # float类型签名使用%g方式，浮点数字(根据值的大小采用%e或%f)
+    # Float type signatures use the %g format; floating-point numbers (using %e or %f depending on the value's magnitude).
     params['temperature'] = '%g' % data['temperature']
     params['top_p'] = '%g' % data['top_p']
     params['stream'] = data["stream"]
-    # 数组按照json结构拼接字符串
+    # Arrays concatenate strings according to JSON structure.
     message_str = ','.join(
         ['{{"role":"{}","content":"{}"}}'.format(message["role"], message["content"]) for message in data["messages"]])
     message_str = '[{}]'.format(message_str)

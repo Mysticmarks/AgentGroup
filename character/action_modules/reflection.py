@@ -14,19 +14,19 @@ def run_reflect(self_id_number:str,
                case_of_belief_change:str,
                engine='gpt4',logger=None):
     '''
-    根据角色自己的描述，以及其他角色描述，和action_history的事情，改变自己对所有其他决的关系、判断
+    Changes the agent's relationships and judgments towards all other characters based on its own description, other characters' descriptions, and action_history events.
     Input:
-        self_id_number: str agent自己的名字
-        self_description: str agent自己的描述
-        self_belief_description: str agent所有的信念
-        all_action_description: str agent能看到的所有行为的描述
-        all_character_description: str 其他所有character
+        self_id_number: str agent's own name.
+        self_description: str agent's own description.
+        self_belief_description: str all of the agent's beliefs.
+        all_action_description: str description of all actions the agent can see.
+        all_character_description: str all other characters.
 
     Output:
-        reflect_thought: str, 反思记忆
-        relationship_change: dict, 更新对于其他角色的好感度
-        belief_change: dict, 对于自己信念的更新
-        judgement_change: dict, 更新的对于其他角色之间社会关系的猜测
+        reflect_thought: str, reflective memory.
+        relationship_change: dict, updates affinity towards other characters.
+        belief_change: dict, updates to one's own beliefs.
+        judgement_change: dict, updated guesses about social relationships between other characters.
     '''
 
     gpt_param = {"temperature": 0.5, "top_p": 1, "stream": False,
@@ -59,8 +59,8 @@ def run_reflect(self_id_number:str,
             raise Exception("[Error]: GPT response parse error")
         return reflect_result, relationship_change, belief_change, judgement_change
 
-    if engine == 'human':  # 人类的update不重要
-        reflect_result = 'This is human, no need to reflect'
+    if engine == 'human':  # Human player updates are not critical.
+        reflect_result = 'This is a human; no reflection is needed.'
         relationship_change = ['0' for i in range(int(len_relationship_change))]
         belief_change = ['0' for i in range(int(len_belief_change))]
         judgement_change = {}

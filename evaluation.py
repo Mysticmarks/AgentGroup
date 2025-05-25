@@ -1,22 +1,22 @@
 '''
-effectiveness evaluation内容
-1. 自己接受了多少条action_history
-2. 自己的action_space
-3. 收到了多少个belief
-4. 收到了多少个relationship
-5. update分数是否在规定范围内
+Effectiveness Evaluation Content
+1. How many action_history entries did self accept?
+2. Self's action_space.
+3. How many beliefs were received?
+4. How many relationships were received?
+5. Is the update score within the specified range?
 
-reasonability evaluation
-1. 生成thought、goal、action来让GPT判断行为是否一致
-2. 某个角色说的所有内容
-3. 所有角色
-4. 设计特定的action history来判断
-    - relationship的更新值
-    - belief的更新值
-    - guess的合理性
-    - vote的合理性
-    - vote except self的合理性
-5. 对于所有结局，guess、vote、vote except self之间的差异性
+Reasonability Evaluation
+1. Generate thought, goal, and action to let GPT judge whether the behavior is consistent.
+2. All content spoken by a certain character.
+3. All characters.
+4. Design specific action history to judge:
+    - The updated value of relationship.
+    - The updated value of belief.
+    - The rationality of guess.
+    - The rationality of vote.
+    - The rationality of vote except self.
+5. For all endings, the differences between guess, vote, and vote except self.
 6.
 '''
 import collections
