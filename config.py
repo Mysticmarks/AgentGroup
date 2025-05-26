@@ -12,6 +12,25 @@ LOG_FOLDER = './logs'
 INPUT_FOLDER = './storage/succession/inputs'
 
 model_cache_dir = 'cache_folder'
+# Directory where users can store their GGUF model files
+GGUF_MODELS_DIR = './gguf_models/'
+
+# Dictionary to register GGUF models with short names.
+# Users should uncomment and edit these lines to map short names to their GGUF model file paths.
+# Ensure the full path is correct, typically by concatenating GGUF_MODELS_DIR with the filename.
+AVAILABLE_GGUF_MODELS = {
+    # "llama2-7b-chat": GGUF_MODELS_DIR + "llama-2-7b-chat.Q4_K_M.gguf",
+    # "mistral-7b-instruct": GGUF_MODELS_DIR + "mistral-7b-instruct-v0.1.Q4_K_M.gguf",
+    # Add more models here as needed
+}
+
+# Default GGUF model short name to use if a character's 'engine' is not specified or set to "default_gguf".
+# Set to one of the keys from AVAILABLE_GGUF_MODELS (e.g., "llama2-7b-chat").
+# If set to None or an empty string, characters without a specific engine will not automatically get a GGUF default.
+DEFAULT_GGUF_MODEL_NAME = None
+# Example:
+# DEFAULT_GGUF_MODEL_NAME = "llama2-7b-chat" 
+
 if 'llama2' in TEST_FOLDER:
     model_cache_dir = 'cache_folder/models--meta-llama--Llama-2-7b-chat-hf/snapshots/9eae4b460bfc40df6c741e67d9634f963b31e02e'
 

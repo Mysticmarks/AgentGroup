@@ -1,0 +1,6 @@
+{
+  "id_name": "example_user",
+  "name": "Example Human User",
+  "type": "human",
+  "engine": "human"
+}

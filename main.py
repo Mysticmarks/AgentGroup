@@ -12,6 +12,7 @@ import json
 from character.all_character_class import AllCharacter
 from environment.all_resource_class import AllResource
 from environment.action_history_class import ActionHistory, Action
+from character.character_class import Character # Import Character class
 
 import os
 from config import *
@@ -177,15 +178,87 @@ class AgentGroupChat:
         self.action_history.save(save_action_history_folder)
         self.logger.gprint('Save self.action_history to: ' + str(save_action_history_folder))
 
-    def new_character_insert(self):
+    def new_character_insert(self,
+                             id_name: str,
+                             name: str,
+                             objective: str,
+                             scratch: str,
+                             background: str,
+                             engine: str,
+                             character_type: str = "ai",
+                             is_main_character: bool = False,
+                             support_character: str = '',
+                             beliefs: dict = None,
+                             judgements: dict = None, # Note: Character class uses defaultdict for judgement
+                             relations: dict = None,   # Note: Character class uses defaultdict for relation
+                             portrait: str = None,
+                             small_portrait: str = None):
         '''
-        Inserts a new character.
+        Creates a new character, saves its configuration, and adds it to the simulation.
         Input:
-            To be determined.
+            Parameters to define the new character.
         Output:
-            To be determined.
+            The created Character object, or None if creation failed.
         '''
-        pass
+        if not self.save_folder:
+            self.logger.gprint("Error: `save_folder` is not set. Cannot save new character.", level="ERROR")
+            return None
+
+        if id_name in self.characters.character_dict:
+            self.logger.gprint(f"Error: Character with ID_NAME '{id_name}' already exists.", level="ERROR")
+            return None
+
+        # --- Create Character Instance ---
+        new_char = Character(id_number=id_name, logger=self.logger)
+        new_char.name = name
+        new_char.objective = objective
+        new_char.scratch = scratch
+        new_char.background = background
+        new_char.engine = engine
+        new_char.type = character_type
+        new_char.main_character = is_main_character
+        new_char.support_character = support_character
+
+        # Optional dictionary attributes
+        if beliefs is not None:
+            new_char.belief = beliefs
+        # For judgements and relations, Character class initializes them as defaultdicts.
+        # If specific initial values are provided, they can be set.
+        if judgements is not None:
+            for key, value in judgements.items(): # Assuming judgements is a simple dict
+                new_char.judgement[key] = value 
+        if relations is not None:
+            for key, value in relations.items(): # Assuming relations is a simple dict
+                new_char.relation[key] = value
+
+        # Default portrait paths (example placeholders, adjust as needed)
+        # Instructions mentioned using C0000.json defaults, but those are not available to me.
+        # Using generic placeholders.
+        default_portrait_path = "./assets/portraits/default_character_portrait.png" 
+        default_small_portrait_path = "./assets/small_portraits/default_character_small_portrait.png"
+        
+        new_char.portrait = portrait if portrait else default_portrait_path
+        new_char.small_portrait = small_portrait if small_portrait else default_small_portrait_path
+        
+        # --- Save Character Configuration ---
+        characters_save_path = os.path.join(self.save_folder, 'characters')
+        if not os.path.exists(characters_save_path):
+            os.makedirs(characters_save_path, exist_ok=True)
+        
+        try:
+            new_char.save(characters_save_path) # Character.save handles filename creation
+            self.logger.gprint(f"Character '{name}' (ID: {id_name}) configuration saved to {os.path.join(characters_save_path, id_name + '.json')}", level="INFO")
+        except Exception as e:
+            self.logger.gprint(f"Error saving character '{name}' (ID: {id_name}): {e}", level="ERROR")
+            return None
+
+        # --- Add Character to Active Session ---
+        # The add_character method in AllCharacter handles adding to lists and dicts.
+        self.characters.add_character(new_char, logger_passed=self.logger) 
+        # add_character in AllCharacter class already logs the addition to simulation.
+
+        self.logger.gprint(f"Character '{name}' (ID: {id_name}) successfully created and added to the simulation.", level="INFO")
+        return new_char
 
     def new_resource_insert(self):
         '''
