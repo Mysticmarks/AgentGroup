@@ -1,0 +1,428 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Chat Interface</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f4f4f4;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+        }
+        #chat-container {
+            display: flex;
+            width: 800px;
+            height: 600px;
+            background-color: #fff;
+            box-shadow: 0 0 10px rgba(0,0,0,0.1);
+            border-radius: 8px;
+            overflow: hidden;
+        }
+        #sidebar {
+            width: 200px;
+            background-color: #f0f0f0;
+            border-right: 1px solid #ddd;
+            padding: 15px;
+            overflow-y: auto;
+        }
+        #sidebar h2 {
+            margin-top: 0;
+            font-size: 1.2em;
+            border-bottom: 1px solid #ccc;
+            padding-bottom: 10px;
+        }
+        #participant-list {
+            list-style-type: none;
+            padding: 0;
+        }
+        #participant-list li {
+            padding: 8px 0;
+            font-size: 0.9em;
+            border-bottom: 1px solid #eee;
+        }
+        #participant-list li:last-child {
+            border-bottom: none;
+        }
+        #main-chat-area {
+            flex-grow: 1;
+            display: flex;
+            flex-direction: column;
+        }
+        #chat-messages {
+            flex-grow: 1;
+            padding: 15px;
+            overflow-y: auto;
+            border-bottom: 1px solid #ddd;
+            background-color: #f9f9f9;
+        }
+        .message {
+            margin-bottom: 10px;
+            padding: 8px 12px;
+            border-radius: 18px;
+            max-width: 80%;
+            line-height: 1.4;
+        }
+        .message .speaker {
+            font-weight: bold;
+            margin-right: 8px;
+        }
+        .message .timestamp {
+            font-size: 0.75em;
+            color: #777;
+            margin-left: 10px;
+        }
+        /* Basic styling for incoming messages */
+        .message.them {
+            background-color: #e9e9eb;
+            align-self: flex-start;
+            border-bottom-left-radius: 4px;
+        }
+        /* Placeholder for user's own messages (requires knowing user_id) */
+        .message.me {
+            background-color: #007bff;
+            color: white;
+            align-self: flex-end;
+            border-bottom-right-radius: 4px;
+        }
+        #input-area {
+            display: flex;
+            padding: 15px;
+            background-color: #fff;
+        }
+        #message-input {
+            flex-grow: 1;
+            padding: 10px;
+            border: 1px solid #ddd;
+            border-radius: 20px;
+            margin-right: 10px;
+            font-size: 1em;
+        }
+        #send-button {
+            padding: 10px 20px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 20px;
+            cursor: pointer;
+            font-size: 1em;
+        }
+        #send-button:hover {
+            background-color: #0056b3;
+        }
+        .status-message {
+            font-style: italic;
+            color: #888;
+            text-align: center;
+            padding: 5px;
+        }
+    </style>
+</head>
+<body>
+    <div id="user-status-bar" style="padding: 10px; background-color: #333; color: white; text-align: center;">
+        <div id="currentUserDisplay">Logged in as: Not set</div>
+    </div>
+    <div id="chat-container">
+        <div id="sidebar">
+            <h2>Participants</h2>
+            <ul id="participant-list">
+                <!-- Participants will be listed here -->
+            </ul>
+        </div>
+        <div id="main-chat-area">
+            <div id="chat-messages">
+                <!-- Messages will appear here -->
+            </div>
+            <div id="input-area">
+                <input type="text" id="message-input" placeholder="Type a message...">
+                <button id="send-button">Send</button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        const participantListUl = document.getElementById("participant-list");
+        const chatMessagesDiv = document.getElementById("chat-messages");
+        const messageInput = document.getElementById("message-input");
+        const sendButton = document.getElementById("send-button");
+        const currentUserDisplay = document.getElementById("currentUserDisplay");
+
+        const uniqueParticipants = new Set();
+        let userId = ""; // Global variable to store the user's ID
+        // currentUserId will be effectively replaced by the global userId for styling 'me' messages
+
+        const ws = new WebSocket("ws://localhost:8080/ws/chat");
+
+        function promptForUserId() {
+            const id = prompt("Please enter your User ID (e.g., example_user):");
+            if (id && id.trim() !== "") {
+                userId = id.trim();
+                currentUserDisplay.textContent = `Logged in as: ${userId}`;
+                messageInput.disabled = false;
+                sendButton.disabled = false;
+                // Optionally, send a 'login' message to the server if needed for presence
+                // ws.send(JSON.stringify({ type: "login", userId: userId })); 
+            } else {
+                alert("User ID is required to chat. Please refresh and enter a valid ID.");
+                // Disable input or handle appropriately
+                messageInput.disabled = true;
+                sendButton.disabled = true;
+                currentUserDisplay.textContent = "Logged in as: Not set (Refresh to try again)";
+            }
+        }
+
+        function addStatusMessage(message) {
+            const statusP = document.createElement("p");
+            statusP.className = "status-message";
+            statusP.textContent = message;
+            chatMessagesDiv.appendChild(statusP);
+            scrollToBottom();
+        }
+
+        ws.onopen = function(event) {
+            console.log("Connected to WebSocket.");
+            addStatusMessage("Connected to WebSocket.");
+            promptForUserId(); // Prompt for User ID after connection
+        };
+
+        ws.onmessage = function(event) {
+            const messageText = event.data;
+            const messageP = document.createElement("p");
+            
+            // Basic parsing: "[HH:MM:SS] speaker_id: content"
+            const match = messageText.match(/^\[(\d{2}:\d{2}:\d{2})\]\s*([^:]+):\s*(.*)$/);
+            
+            if (match) {
+                const timestamp = match[1];
+                const speakerId = match[2];
+                const content = match[3];
+
+                const speakerSpan = document.createElement("span");
+                speakerSpan.className = "speaker";
+                speakerSpan.textContent = speakerId;
+
+                const timestampSpan = document.createElement("span");
+                timestampSpan.className = "timestamp";
+                timestampSpan.textContent = `(${timestamp})`;
+                
+                messageP.appendChild(speakerSpan);
+                messageP.appendChild(document.createTextNode(content + " ")); // Add space before timestamp
+                messageP.appendChild(timestampSpan);
+                
+                messageP.classList.add("message");
+                // Use the global userId (set by prompt) to style user's own messages
+                if (userId && speakerId === userId) { 
+                    messageP.classList.add("me");
+                } else {
+                    messageP.classList.add("them");
+                }
+
+                // Update participant list
+                if (!uniqueParticipants.has(speakerId)) {
+                    uniqueParticipants.add(speakerId);
+                    renderParticipantList();
+                }
+            } else {
+                // Fallback for messages not matching the format (e.g., server status messages)
+                messageP.textContent = messageText;
+                messageP.classList.add("status-message"); // Or a different class for generic server messages
+            }
+            
+            chatMessagesDiv.appendChild(messageP);
+            scrollToBottom();
+        };
+
+        ws.onclose = function(event) {
+            console.log("Disconnected from WebSocket.");
+            addStatusMessage("Disconnected from WebSocket.");
+        };
+
+        ws.onerror = function(event) {
+            console.error("WebSocket error:", event);
+            addStatusMessage("Error connecting to WebSocket.");
+        };
+
+        function sendMessage() {
+            const messageText = messageInput.value.trim();
+            if (!userId) {
+                alert("User ID not set. Please refresh and enter your User ID.");
+                addStatusMessage("User ID not set. Cannot send message.");
+                return;
+            }
+            if (messageText && ws.readyState === WebSocket.OPEN) {
+                const messagePayload = {
+                    userId: userId,
+                    content: messageText
+                };
+                ws.send(JSON.stringify(messagePayload));
+                
+                // Styling user's own messages relies on server broadcast now, which is good.
+                // No need to optimistically add here if server echoes reliably.
+                messageInput.value = "";
+            } else if (ws.readyState !== WebSocket.OPEN) {
+                addStatusMessage("Not connected to WebSocket. Cannot send message.");
+            }
+        }
+
+        function renderParticipantList() {
+            participantListUl.innerHTML = ""; // Clear current list
+            uniqueParticipants.forEach(participantId => {
+                const li = document.createElement("li");
+                li.textContent = participantId;
+                participantListUl.appendChild(li);
+            });
+        }
+
+        function scrollToBottom() {
+            chatMessagesDiv.scrollTop = chatMessagesDiv.scrollHeight;
+        }
+
+        sendButton.addEventListener("click", sendMessage);
+        messageInput.addEventListener("keypress", function(event) {
+            if (event.key === "Enter") {
+                sendMessage();
+            }
+        });
+        
+        // Initial state for input fields (will be enabled after User ID prompt)
+        messageInput.disabled = true;
+        sendButton.disabled = true;
+
+        async function createAgent() {
+            const agentData = {
+                id_name: document.getElementById("newAgentId").value.trim(),
+                name: document.getElementById("newAgentName").value.trim(),
+                objective: document.getElementById("newAgentObjective").value.trim(),
+                scratch: document.getElementById("newAgentScratch").value.trim(),
+                background: document.getElementById("newAgentBackground").value.trim(),
+                engine: document.getElementById("newAgentEngineSelect").value // Read from select
+                // Optional fields like character_type, is_main_character can be added here if inputs are provided
+            };
+
+            const statusDiv = document.getElementById("agentCreationStatus");
+            statusDiv.textContent = ""; // Clear previous status
+
+            if (!agentData.id_name || !agentData.name) {
+                statusDiv.textContent = "Agent ID and Name are required.";
+                statusDiv.style.color = "red";
+                return;
+            }
+            if (!agentData.engine) { // Engine is also crucial
+                statusDiv.textContent = "Engine is required.";
+                statusDiv.style.color = "red";
+                return;
+            }
+
+
+            try {
+                addStatusMessage("Attempting to create agent: " + agentData.id_name); // Notify in main chat
+                const response = await fetch("/api/v1/create_agent_in_conversation", {
+                    method: "POST",
+                    headers: { "Content-Type": "application/json" },
+                    body: JSON.stringify(agentData)
+                });
+                const result = await response.json(); // Must await .json() to get the body
+                
+                if (response.ok) {
+                    statusDiv.textContent = result.message || "Agent created successfully!";
+                    statusDiv.style.color = "green";
+                    addStatusMessage(`System: Agent ${agentData.name} (ID: ${agentData.id_name}) created and added.`);
+                    // Clear form fields
+                    document.getElementById("newAgentId").value = "";
+                    document.getElementById("newAgentName").value = "";
+                    document.getElementById("newAgentObjective").value = "";
+                    document.getElementById("newAgentScratch").value = "";
+                    document.getElementById("newAgentBackground").value = "";
+                    // document.getElementById("newAgentEngineSelect").value = ""; // Reset select, or to a default
+                    // New agent won't appear in participant list until it speaks or client refreshes list from server
+                } else {
+                    statusDiv.textContent = "Error: " + (result.detail || "Failed to create agent.");
+                    statusDiv.style.color = "red";
+                    addStatusMessage(`System: Failed to create agent ${agentData.id_name}. Server: ${result.detail || "Failed to create agent."}`);
+                }
+            } catch (error) {
+                console.error("Create agent error:", error);
+                statusDiv.textContent = "Network or server error during agent creation.";
+                statusDiv.style.color = "red";
+                addStatusMessage(`System: Network or server error creating agent ${agentData.id_name}.`);
+            }
+        }
+
+        async function populateEngineSelect() {
+            const selectElement = document.getElementById("newAgentEngineSelect");
+            // Clear existing options (if any)
+            selectElement.innerHTML = ""; 
+
+            try {
+                const response = await fetch("/api/v1/available_models");
+                if (!response.ok) {
+                    console.error("Failed to fetch available models:", response.status);
+                    // Add a default placeholder option
+                    const defaultOption = document.createElement("option");
+                    defaultOption.value = "";
+                    defaultOption.textContent = "Error loading models";
+                    selectElement.appendChild(defaultOption);
+                    return;
+                }
+                const data = await response.json();
+                const models = data.models || [];
+
+                if (models.length === 0) {
+                     const noModelsOption = document.createElement("option");
+                     noModelsOption.value = "";
+                     noModelsOption.textContent = "No models configured";
+                     selectElement.appendChild(noModelsOption);
+                } else {
+                    models.forEach(modelName => {
+                        const option = document.createElement("option");
+                        option.value = modelName;
+                        option.textContent = modelName;
+                        selectElement.appendChild(option);
+                    });
+                }
+            } catch (error) {
+                console.error("Error fetching or populating models:", error);
+                const errorOption = document.createElement("option");
+                errorOption.value = "";
+                errorOption.textContent = "Failed to load models";
+                selectElement.appendChild(errorOption);
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', (event) => {
+             // Existing ws connection setup and promptForUserId can remain here
+             // If ws.onopen calls promptForUserId, that's fine.
+             populateEngineSelect(); // Populate engine select on page load
+        });
+
+    </script>
+    <div id="agent-creation-area" style="padding: 20px; margin-top: 20px; border-top: 1px solid #ccc; background-color: #f9f9f9; width: 800px; margin-left: auto; margin-right: auto; border-radius: 0 0 8px 8px;">
+        <h2>Create New AI Agent</h2>
+        <label for="newAgentId">Agent ID:</label><br>
+        <input type="text" id="newAgentId" placeholder="e.g., ai_bot_1" style="width: 95%; margin-bottom: 10px; padding: 8px;"><br>
+        
+        <label for="newAgentName">Agent Name:</label><br>
+        <input type="text" id="newAgentName" placeholder="e.g., Bot Alpha" style="width: 95%; margin-bottom: 10px; padding: 8px;"><br>
+        
+        <label for="newAgentObjective">Objective:</label><br>
+        <textarea id="newAgentObjective" placeholder="Agent's main goal" style="width: 95%; margin-bottom: 10px; padding: 8px; min-height: 60px;"></textarea><br>
+        
+        <label for="newAgentScratch">Personality/Scratch:</label><br>
+        <textarea id="newAgentScratch" placeholder="Brief personality traits or core programming" style="width: 95%; margin-bottom: 10px; padding: 8px; min-height: 60px;"></textarea><br>
+        
+        <label for="newAgentBackground">Background:</label><br>
+        <textarea id="newAgentBackground" placeholder="Agent's backstory or context" style="width: 95%; margin-bottom: 10px; padding: 8px; min-height: 60px;"></textarea><br>
+        
+        <label for="newAgentEngineSelect">Engine:</label><br>
+        <select id="newAgentEngineSelect" style="width: 98%; margin-bottom: 10px; padding: 8px;"></select><br>
+        
+        <button onclick="createAgent()" style="padding: 10px 20px; background-color: #28a745; color: white; border: none; border-radius: 5px; cursor: pointer;">Create Agent</button>
+        <div id="agentCreationStatus" style="margin-top: 10px; font-weight: bold;"></div>
+    </div>
+</body>
+</html>
